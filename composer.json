@@ -1,0 +1,20 @@
+{
+    "name": "timandes/reflection",
+    "type": "library",
+    "description": "Reflection related library",
+    "keywords": ["php", "reflection", "dynamic", "proxy"],
+    "homepage": "https://github.com/Timandes/reflection",
+    "license": "Apache-2.0",
+    "authors": [
+        {"name": "Timandes White", "email": "timandes@php.net"}
+    ],
+    "require": {
+        "php": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": {"Timandes\\Reflection\\": "src/"}
+    }
+}
