@@ -95,7 +95,8 @@ EOT;
                 continue;
             }
             if ($rm->isConstructor()
-                    || $rm->isDestructor()) {
+                    || $rm->isDestructor()
+                    || $rm->isStatic()) {
                 continue;
             }
 
