@@ -86,6 +86,10 @@ EOT;
             if (!$rm->isPublic()) {
                 continue;
             }
+            if ($rm->isConstructor()
+                    || $rm->isDestructor()) {
+                continue;
+            }
 
             $methodsDef .= $this->buildOverridingMethod($rm);
         }
