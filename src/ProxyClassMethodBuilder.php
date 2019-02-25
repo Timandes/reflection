@@ -43,6 +43,14 @@ class ProxyClassMethodBuilder
                 $pbr = $rp->isPassedByReference()?'&':'';
             }
             $a[] = ($pbr??'') . '$' . $rp->getName();
+            if ($rp->isDefaultValueAvailable()) {
+                if ($rp->isDefaultValueConstant()) {
+                    $default = $rp->getDefaultValueConstantName();
+                } else {
+                    $default = var_export($rp->getDefaultValue(), true);
+                }
+                $a[] = '=' . $default;
+            }
             $parts[] = implode(' ', $a);
         }
 
