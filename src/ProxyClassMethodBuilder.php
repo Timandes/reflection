@@ -30,20 +30,24 @@ namespace Timandes\Reflection;
  */
 class ProxyClassMethodBuilder
 {
-    public function buildParameterList(\ReflectionMethod $rm, bool $withTypes = true): string
+    /**
+     * @param bool $defExp Definition expression or not
+     */
+    public function buildParameterList(\ReflectionMethod $rm, bool $defExp = true): string
     {
         $parameters = $rm->getParameters();
         $parts = [];
         foreach ($parameters as $rp) {
             $a = [];
-            if ($withTypes) {
+            if ($defExp) {
                 if ($rp->hasType()) {
                     $a[] = $rp->getType()->getName();
                 }
                 $pbr = $rp->isPassedByReference()?'&':'';
             }
             $a[] = ($pbr??'') . '$' . $rp->getName();
-            if ($rp->isDefaultValueAvailable()) {
+            if ($defExp
+                    && $rp->isDefaultValueAvailable()) {
                 if ($rp->isDefaultValueConstant()) {
                     $default = $rp->getDefaultValueConstantName();
                 } else {

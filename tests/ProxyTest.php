@@ -28,14 +28,14 @@ class ProxyTest extends \PHPUnit\Framework\TestCase
         });
         $actual = $fooBarProxy->foo();
         $this->assertEquals('foo', $actual);
-        $actual = $fooBarProxy->bar();
+        $actual = $fooBarProxy->bar(2);
         $this->assertEquals('bar', $actual);
 
         $expected = <<<'EOT'
 Before invoking
 DefaultFooBar::foo()
 Before invoking
-DefaultFooBar::bar()
+DefaultFooBar::bar(2)
 
 EOT;
         $this->expectOutputString($expected);
@@ -71,7 +71,7 @@ interface Foo
 
 interface Bar
 {
-    public function bar();
+    public function bar(int $i = 1);
 }
 
 class DefaultFooBar implements Foo, Bar
@@ -81,9 +81,9 @@ class DefaultFooBar implements Foo, Bar
         echo 'DefaultFooBar::foo()' . PHP_EOL;
         return 'foo';
     }
-    public function bar()
+    public function bar(int $i = 1)
     {
-        echo 'DefaultFooBar::bar()' . PHP_EOL;
+        echo 'DefaultFooBar::bar(' . $i . ')' . PHP_EOL;
         return 'bar';
     }
 }
