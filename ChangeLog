@@ -1,4 +1,8 @@
 
+v0.2.0
+----
+* Add nullable type support
+
 v0.1.0
 ----
 * Skip constructors N destructors
