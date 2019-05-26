@@ -41,7 +41,7 @@ class ProxyClassMethodBuilder
             $a = [];
             if ($defExp) {
                 if ($rp->hasType()) {
-                    $a[] = $rp->getType()->getName();
+                    $a[] = $this->getTypeRepresentative($rp);
                 }
                 $pbr = $rp->isPassedByReference()?'&':'';
             }
@@ -61,6 +61,31 @@ class ProxyClassMethodBuilder
         return implode(', ', $parts);
     }
 
+    public function getTypeRepresentative(\ReflectionParameter $rp): string
+    {
+        if (PHP_VERSION_ID < 70100) {
+            return $rp->getType()->__toString();
+        }
+
+        $returnValue = $rp->getType()->getName();
+        if ($returnValue{0} == '?') {
+            return $returnValue;
+        }
+        if ($rp->allowsNull()) {
+            return '?' . $returnValue;
+        }
+        return $returnValue;
+    }
+
+    public function getTypeName(\ReflectionType $rt): string
+    {
+        if (PHP_VERSION_ID < 70100) {
+            return $rt->__toString();
+        } else {
+            return $rt->getName();
+        }
+    }
+
     public function buildOverridingMethod(\ReflectionMethod $rm): string
     {
         $parts = ['public function'];
@@ -71,7 +96,7 @@ class ProxyClassMethodBuilder
 
         if ($rm->hasReturnType()) {
             $rt = $rm->getReturnType();
-            $parts[] = ': ' . $rt->getName();
+            $parts[] = ': ' . $this->getTypeName($rt);
         }
 
         $parameterList = $this->buildParameterList($rm, false);

@@ -71,7 +71,7 @@ interface Foo
 
 interface Bar
 {
-    public function bar(int $i = 1);
+    public function bar(int $i = 1): string;
 }
 
 class DefaultFooBar implements Foo, Bar
@@ -81,7 +81,7 @@ class DefaultFooBar implements Foo, Bar
         echo 'DefaultFooBar::foo()' . PHP_EOL;
         return 'foo';
     }
-    public function bar(int $i = 1)
+    public function bar(int $i = 1): string
     {
         echo 'DefaultFooBar::bar(' . $i . ')' . PHP_EOL;
         return 'bar';

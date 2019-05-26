@@ -2,6 +2,10 @@
     <testsuites>
         <testsuite name="default">
             <directory>./tests</directory>
+            <exclude>tests/Proxy71Test.php</exclude>
+            <file phpVersion="7.1.0">tests/Proxy71Test.php</file>
+            <exclude>tests/Enhancer71Test.php</exclude>
+            <file phpVersion="7.1.0">tests/Enhancer71Test.php</file>
         </testsuite>
     </testsuites>
 </phpunit>
