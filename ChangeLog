@@ -2,6 +2,7 @@
 v0.2.0
 ----
 * Add nullable type support
+* Add variadic arguments support
 * Fix warnings when using 'passed by reference' parameters
 
 v0.1.0

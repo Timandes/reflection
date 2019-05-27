@@ -30,6 +30,32 @@ namespace Timandes\Reflection;
  */
 class ProxyClassMethodBuilder
 {
+    public function buildParameter(\ReflectionParameter $rp, bool $defExp): string
+    {
+        $a = [];
+
+        $vlal = '';
+        if ($defExp) {
+            if ($rp->hasType()) {
+                $a[] = $this->getTypeRepresentative($rp);
+            }
+            $vlal = $rp->isVariadic()?'...':'';
+        }
+        $pbr = $rp->isPassedByReference()?'&':'';
+        $a[] = $pbr . $vlal . '$' . $rp->getName();
+        if ($defExp
+                && $rp->isDefaultValueAvailable()) {
+            if ($rp->isDefaultValueConstant()) {
+                $default = $rp->getDefaultValueConstantName();
+            } else {
+                $default = var_export($rp->getDefaultValue(), true);
+            }
+            $a[] = '=' . $default;
+        }
+
+        return implode(' ', $a);
+    }
+
     /**
      * @param bool $defExp Definition expression or not
      */
@@ -38,24 +64,11 @@ class ProxyClassMethodBuilder
         $parameters = $rm->getParameters();
         $parts = [];
         foreach ($parameters as $rp) {
-            $a = [];
-            if ($defExp) {
-                if ($rp->hasType()) {
-                    $a[] = $this->getTypeRepresentative($rp);
-                }
+            if (!$defExp && $rp->isVariadic()) {
+                // Skip last variable-length parameter
+                continue;
             }
-            $pbr = $rp->isPassedByReference()?'&':'';
-            $a[] = $pbr . '$' . $rp->getName();
-            if ($defExp
-                    && $rp->isDefaultValueAvailable()) {
-                if ($rp->isDefaultValueConstant()) {
-                    $default = $rp->getDefaultValueConstantName();
-                } else {
-                    $default = var_export($rp->getDefaultValue(), true);
-                }
-                $a[] = '=' . $default;
-            }
-            $parts[] = implode(' ', $a);
+            $parts[] = $this->buildParameter($rp, $defExp);
         }
 
         return implode(', ', $parts);
@@ -100,13 +113,34 @@ class ProxyClassMethodBuilder
         }
 
         $parameterList = $this->buildParameterList($rm, false);
+
+        // Variable-length parameter
+        $possibleArrayMergeStatements = $this->buildArrayMergeForVariadicParameter($rm, 'args');
+
         $body = <<<EOT
 {
-    return \$this->callTargetMethod('{$methodName}', [{$parameterList}]);
+    \$args = [{$parameterList}];
+    {$possibleArrayMergeStatements}
+    return \$this->callTargetMethod('{$methodName}', \$args);
 }
 EOT;
 
         return implode(' ', $parts) . $body;
+    }
+
+    public function buildArrayMergeForVariadicParameter(\ReflectionMethod $rm, string $varName): string
+    {
+        $parameters = $rm->getParameters();
+        if (!$parameters) {
+            return '';
+        }
+
+        $lastParmeter = array_pop($parameters);
+        if (!$lastParmeter->isVariadic()) {
+            return '';
+        }
+
+        return "\${$varName} = array_merge(\${$varName}, \${$lastParmeter->getName()});";
     }
 
     /**
