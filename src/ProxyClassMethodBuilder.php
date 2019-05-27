@@ -43,9 +43,9 @@ class ProxyClassMethodBuilder
                 if ($rp->hasType()) {
                     $a[] = $this->getTypeRepresentative($rp);
                 }
-                $pbr = $rp->isPassedByReference()?'&':'';
             }
-            $a[] = ($pbr??'') . '$' . $rp->getName();
+            $pbr = $rp->isPassedByReference()?'&':'';
+            $a[] = $pbr . '$' . $rp->getName();
             if ($defExp
                     && $rp->isDefaultValueAvailable()) {
                 if ($rp->isDefaultValueConstant()) {
