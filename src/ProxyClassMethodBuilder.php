@@ -107,9 +107,15 @@ class ProxyClassMethodBuilder
         $parts[] = $methodName;
         $parts[] = '(' . $this->buildParameterList($rm) . ')';
 
+        $returnClause = 'return ';
         if ($rm->hasReturnType()) {
             $rt = $rm->getReturnType();
-            $parts[] = ': ' . $this->getTypeName($rt);
+            $tn = $this->getTypeName($rt);
+            $parts[] = ': ' . $tn;
+
+            if ($tn == 'void') {
+                $returnClause = '';
+            }
         }
 
         $parameterList = $this->buildParameterList($rm, false);
@@ -121,7 +127,7 @@ class ProxyClassMethodBuilder
 {
     \$args = [{$parameterList}];
     {$possibleArrayMergeStatements}
-    return \$this->callTargetMethod('{$methodName}', \$args);
+    {$returnClause}\$this->callTargetMethod('{$methodName}', \$args);
 }
 EOT;
 

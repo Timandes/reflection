@@ -29,9 +29,13 @@ class Proxy71Test extends \PHPUnit\Framework\TestCase
         $actual = $bazProxy->bar(null);
         $this->assertEquals('bar', $actual);
 
+        $bazProxy->voidBar();
+
         $expected = <<<'EOT'
 Before invoking
 DefaultBaz::bar((nil))
+Before invoking
+DefaultBaz::voidBar()
 
 EOT;
         $this->expectOutputString($expected);
@@ -42,6 +46,7 @@ EOT;
 interface Baz
 {
     public function bar(?string $s, string $v = null): ?string;
+    public function voidBar(): void;
 }
 
 class DefaultBaz implements Baz
@@ -53,5 +58,10 @@ class DefaultBaz implements Baz
         }
         echo 'DefaultBaz::bar(' . $s . ')' . PHP_EOL;
         return 'bar';
+    }
+
+    public function voidBar(): void
+    {
+        echo 'DefaultBaz::voidBar()' . PHP_EOL;
     }
 }
