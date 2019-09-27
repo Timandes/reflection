@@ -76,11 +76,8 @@ class ProxyClassMethodBuilder
 
     public function getTypeRepresentative(\ReflectionParameter $rp): string
     {
-        if (PHP_VERSION_ID < 70100) {
-            return $rp->getType()->__toString();
-        }
-
-        $returnValue = $rp->getType()->getName();
+        $rt = $rp->getType();
+        $returnValue = $this->getTypeName($rt);
         if ($returnValue{0} == '?') {
             return $returnValue;
         }
@@ -94,9 +91,16 @@ class ProxyClassMethodBuilder
     {
         if (PHP_VERSION_ID < 70100) {
             return $rt->__toString();
-        } else {
-            return $rt->getName();
         }
+
+        $returnValue = $rt->getName();
+        if ($returnValue{0} == '?') {
+            return $returnValue;
+        }
+        if ($rt->allowsNull()) {
+            return '?' . $returnValue;
+        }
+        return $returnValue;
     }
 
     public function buildOverridingMethod(\ReflectionMethod $rm): string

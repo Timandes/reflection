@@ -19,15 +19,26 @@ use Timandes\Reflection\Proxy;
 
 class Proxy71Test extends \PHPUnit\Framework\TestCase
 {
-    public function testWithAllInterfaces()
+    public function withAllInterfacesDataProvider(): array
     {
-        $baz = new DefaultBaz();
+        return [
+            [DefaultBaz::class, 'bar'],
+            [AnotherBaz::class, null],
+        ];
+    }
+
+    /**
+     * @dataProvider withAllInterfacesDataProvider
+     */
+    public function testWithAllInterfaces(string $className, $expected): void
+    {
+        $baz = new $className();
         $bazProxy = Proxy::newProxyInstance($baz, [Baz::class], function($proxy, \ReflectionMethod $method, array $args) use($baz) {
             echo "Before invoking" . PHP_EOL;
             return $method->invokeArgs($baz, $args);
         });
         $actual = $bazProxy->bar(null);
-        $this->assertEquals('bar', $actual);
+        $this->assertEquals($expected, $actual);
 
         $bazProxy->voidBar();
 
@@ -41,6 +52,7 @@ EOT;
         $this->expectOutputString($expected);
         $this->assertTrue($baz instanceof Baz);
     }
+
 }
 
 interface Baz
@@ -56,12 +68,21 @@ class DefaultBaz implements Baz
         if (is_null($s)) {
             $s = '(nil)';
         }
-        echo 'DefaultBaz::bar(' . $s . ')' . PHP_EOL;
+        echo __METHOD__ . '(' . $s . ')' . PHP_EOL;
         return 'bar';
     }
 
     public function voidBar(): void
     {
-        echo 'DefaultBaz::voidBar()' . PHP_EOL;
+        echo __METHOD__ . '()' . PHP_EOL;
+    }
+}
+
+class AnotherBaz extends DefaultBaz
+{
+    public function bar(?string $s, string $v = null): ?string
+    {
+        parent::bar($s, $v);
+        return null;
     }
 }
